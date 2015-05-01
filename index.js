@@ -115,9 +115,9 @@ plugin.writeReports = function (opts) {
     return Report.create(r, _.clone(opts.reportOpts));
   });
 
-  var cover = through();
-
-  cover.on('end', function () {
+  var cover = through(function (file, enc, cb) {
+    cb(null, file);
+  }, function (cb) {
     var collector = new Collector();
 
     // revert to an object if there are not macthing source files.
@@ -126,7 +126,8 @@ plugin.writeReports = function (opts) {
     reporters.forEach(function (report) {
       report.writeReport(collector, true);
     });
-  }).resume();
+    cb();
+  });
 
   return cover;
 };
